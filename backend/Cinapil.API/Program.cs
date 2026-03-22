@@ -39,19 +39,29 @@ builder.Services.AddHttpClient<TmdbService>();
 // Controllers
 builder.Services.AddControllers();
 
-// CORS
+// CORS 
+var corsSection = builder.Configuration.GetSection("Cors");
+var allowedOrigins = corsSection.GetSection("AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:3000", "https://cinapil.vercel.app" };
+var allowVercelPreviewUrls = corsSection.GetValue("AllowVercelPreviewUrls", true);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "https://cinapil.vercel.app"
-        )
-        .SetIsOriginAllowedToAllowWildcardSubdomains()
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        policy
+            .SetIsOriginAllowed(origin =>
+            {
+                if (string.IsNullOrEmpty(origin)) return false;
+                if (allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase)) return true;
+                if (!allowVercelPreviewUrls) return false;
+                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+                return uri.Scheme == "https"
+                    && uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase);
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
