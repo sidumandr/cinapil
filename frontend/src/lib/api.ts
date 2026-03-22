@@ -1,10 +1,12 @@
-const API_URL = "http://localhost:5079/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
+  : "http://localhost:5079/api";
 
-export async function apiRequest(
-  endpoint: string,
-  options: RequestInit = {}
-) {
-  const token = typeof window !== "undefined" ? localStorage.getItem("cinapil-token") : null;
+export async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("cinapil-token")
+      : null;
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
@@ -26,7 +28,10 @@ export async function apiRequest(
 // Auth
 export const authApi = {
   register: (data: { username: string; email: string; password: string }) =>
-    apiRequest("/auth/register", { method: "POST", body: JSON.stringify(data) }),
+    apiRequest("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 
   login: (data: { email: string; password: string }) =>
     apiRequest("/auth/login", { method: "POST", body: JSON.stringify(data) }),
@@ -40,10 +45,16 @@ export const moviesApi = {
   getWatched: () => apiRequest("/movies/watched"),
 
   addToWatchlist: (movie: MoviePayload) =>
-    apiRequest("/movies/watchlist", { method: "POST", body: JSON.stringify(movie) }),
+    apiRequest("/movies/watchlist", {
+      method: "POST",
+      body: JSON.stringify(movie),
+    }),
 
   addToWatched: (movie: MoviePayload) =>
-    apiRequest("/movies/watched", { method: "POST", body: JSON.stringify(movie) }),
+    apiRequest("/movies/watched", {
+      method: "POST",
+      body: JSON.stringify(movie),
+    }),
 
   removeFromWatchlist: (movieId: number) =>
     apiRequest(`/movies/watchlist/${movieId}`, { method: "DELETE" }),
