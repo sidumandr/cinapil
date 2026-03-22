@@ -8,4 +8,4 @@ obj/
 **/.next/
 dist/
 .DS_Store
-.env*
+.env***/appsettings.json

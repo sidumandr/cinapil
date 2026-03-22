@@ -33,6 +33,8 @@ builder.Services.AddAuthorization();
 
 // Token Service
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddHttpClient<TmdbService>();
+
 
 // Controllers
 builder.Services.AddControllers();
@@ -42,7 +44,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000", "http://cinapil.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

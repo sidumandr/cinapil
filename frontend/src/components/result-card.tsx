@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { getImageUrl, type Movie } from "@/lib/tmdb";
 import { useMovies } from "@/context/movie-context";
+import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   ChevronDown,
@@ -20,6 +22,8 @@ interface ResultCardProps {
 
 export function ResultCard({ movie }: ResultCardProps) {
   const { addToWatchlist, isInWatchlist, isInWatched } = useMovies();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const [showOverview, setShowOverview] = useState(false);
   const posterUrl = getImageUrl(movie.poster_path, "w200");
   const alreadyAdded = isInWatchlist(movie.id) || isInWatched(movie.id);
@@ -98,7 +102,13 @@ export function ResultCard({ movie }: ResultCardProps) {
                 : "btn-primary shadow-lg shadow-primary/20"
             }`}
             disabled={alreadyAdded}
-            onClick={() => addToWatchlist(movie)}
+            onClick={() => {
+              if (!isAuthenticated) {
+                router.push("/login");
+                return;
+              }
+              addToWatchlist(movie);
+            }}
           >
             {alreadyAdded ? (
               <>
