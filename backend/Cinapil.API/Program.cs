@@ -48,6 +48,7 @@ builder.Services.AddCors(options =>
             "http://localhost:3000",
             "https://cinapil.vercel.app"
         )
+        .SetIsOriginAllowedToAllowWildcardSubdomains()
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
